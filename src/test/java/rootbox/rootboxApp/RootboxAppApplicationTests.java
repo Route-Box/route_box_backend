@@ -1,0 +1,13 @@
+package rootbox.rootboxApp;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class RootboxAppApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
