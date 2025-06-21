@@ -18,5 +18,5 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserApi {
 
     @GetMapping(value = "/health")
-    public String health() {return "I'm healthy"  ;}
+    public String health() {return "I'm healthy" ;}
 }
