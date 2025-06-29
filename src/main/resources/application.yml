@@ -38,10 +38,9 @@ spring:
       on-profile: "dev"
   jackson:
     time-zone: Asia/Seoul
-  datasource:
     username: ${aws.db.username}
     password: ${aws.db.password}
-    url: jdbc:mysql://${aws.db.url}/${aws.db.name}?autoReconnect=true&setTimezone=Asia/Seoul
+    url: jdbc:mysql://${aws.db.url}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -104,8 +103,8 @@ spring:
       on-profile: "local"
   datasource:
     username: root
-    password: 1234
-    url: jdbc:mysql://localhost:3306/rootbox
+    password: 12345678
+    url: jdbc:mysql://routebox-dev-db.cb2ag0e4u15c.ap-northeast-2.rds.amazonaws.com:3306/routebox
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
