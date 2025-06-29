@@ -1,15 +1,22 @@
-package rootbox.rootboxApp.global.security;
+package rootbox.rootboxApp.global.security.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import rootbox.rootboxApp.global.security.filter.JwtAuthFilter;
+import rootbox.rootboxApp.global.security.handler.JwtAccessDeniedHandler;
+import rootbox.rootboxApp.global.security.handler.JwtAuthenticationEntryPoint;
+import rootbox.rootboxApp.global.security.handler.JwtAuthenticationExceptionHandler;
+import rootbox.rootboxApp.global.security.provider.TokenProvider;
 
 import java.util.Collections;
 
@@ -18,15 +25,15 @@ import java.util.Collections;
 //@EnableWebSecurity(debug = true)
 @Configuration
 public class SecurityConfig {
-//
-//    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint = new JwtAuthenticationEntryPoint();
-//
-//    private final JwtAccessDeniedHandler jwtAccessDeniedHandler = new JwtAccessDeniedHandler();
-//
-//    private final TokenProvider tokenProvider;
-//
-//    private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler =
-//            new JwtAuthenticationExceptionHandler();
+
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint = new JwtAuthenticationEntryPoint();
+
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler = new JwtAccessDeniedHandler();
+
+    private final TokenProvider tokenProvider;
+
+    private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler =
+            new JwtAuthenticationExceptionHandler();
 
     private static final String[] JWT_WHITE_LIST ={
             "/users/login-tmp","/users/reissue"
@@ -53,12 +60,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain JwtFilterChain(HttpSecurity http) throws Exception {
         return http.cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfiguration()))
+                .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable) // 비활성화
                 .sessionManagement(
                         manage ->
                                 manage.sessionCreationPolicy(
                                         SessionCreationPolicy.STATELESS)) // Session 사용 안함
                 .formLogin(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(
+                        authorize -> {
+//                            authorize.requestMatchers("/swagger-ui/**").permitAll();
+                            authorize.requestMatchers("/api/v1/users/**").permitAll();
+                            authorize.anyRequest().authenticated();
+                        })
+                .exceptionHandling(
+                        exceptionHandling ->
+                                exceptionHandling
+                                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                                        .accessDeniedHandler(jwtAccessDeniedHandler))
+                .addFilterBefore(
+                        new JwtAuthFilter(tokenProvider, JWT_WHITE_LIST),
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationExceptionHandler, JwtAuthFilter.class)
                 .build();
     }
 

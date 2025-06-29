@@ -127,13 +127,13 @@ spring:
         format_sql: true
         use_sql_comments: true
         hbm2ddl:
-          auto: create
+          auto: update
         default_batch_fetch_size: 1000
 jwt:
   header: Authorization
   # dev server
   secret:
-    key: ${JWT_SECRET}
+    key: secretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecret
   #  secret : ${JWT_SECRET}
   authorities-key: authoritiesKey
   access-token-validity-in-seconds: 120000 # 2 min

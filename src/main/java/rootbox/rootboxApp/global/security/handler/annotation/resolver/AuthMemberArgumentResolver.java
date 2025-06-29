@@ -1,0 +1,62 @@
+package rootbox.rootboxApp.global.security.handler.annotation.resolver;
+
+import org.springframework.core.MethodParameter;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
+import rootbox.rootboxApp.api.user.business.UserMapper;
+import rootbox.rootboxApp.global.common.exception.base.GeneralException;
+import rootbox.rootboxApp.global.common.exception.base.GlobalErrorCode;
+import rootbox.rootboxApp.global.entity.User;
+import rootbox.rootboxApp.global.security.handler.annotation.AuthMember;
+
+import java.util.Optional;
+
+public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver {
+    /**
+     * supportsParameter
+     * - 해당 파라미터를 지원하는지 여부를 반환
+     * - AuthMember 어노테이션이 없거나, Member 타입이 아닌 경우 false 반환
+     */
+    @Override
+    public boolean supportsParameter(MethodParameter parameter) {
+        AuthMember authUser = parameter.getParameterAnnotation(AuthMember.class); // 메서드 파라미터에서 @AuthMember 찾기
+        if (authUser == null) return false;
+        if (parameter.getParameterType().equals(User.class) == false) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * resolveArgument
+     * 실제로 파라미터의 값을 해석해주는 메서드
+     *  파라미터에 전달할 객체를 반환
+     * - SecurityContextHolder에서 인증 객체를 가져와서 User 객체로 변환하여 반환
+     */
+    @Override
+    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+        Object principal = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            principal = authentication.getPrincipal();
+        }
+        if (principal == null || principal.getClass() == String.class) { //Authentication 객체가 null이거나, principal이 String 타입('anonymousUser')인 경우
+            throw new GeneralException(GlobalErrorCode.USER_NOT_FOUND);
+        }
+
+        UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) authentication;
+
+        Optional<User> user = UserMapper.toUserSecurity(authenticationToken.getName());
+
+        if (user.isEmpty())
+            throw new GeneralException(GlobalErrorCode.USER_NOT_FOUND);
+        else
+            return user.get();
+    }
+}
