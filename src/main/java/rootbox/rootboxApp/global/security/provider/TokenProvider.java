@@ -60,7 +60,7 @@ public class TokenProvider {
     public String resolveToken(HttpServletRequest request, String tokenType) {
         String headerName;
 
-        if ("Access".equals(tokenType)) {
+        if ("Authorization".equals(tokenType)) {
             headerName = ACCESS_TOKEN_HEADER; // 올바른 상수 이름이어야 합니다.
         } else if ("Refresh".equals(tokenType)) {
             headerName = REFRESH_TOKEN_HEADER; // 올바른 상수 이름이어야 합니다.

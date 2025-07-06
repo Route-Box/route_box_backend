@@ -17,6 +17,7 @@ import rootbox.rootboxApp.global.security.provider.TokenProvider;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Enumeration;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,8 +33,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        log.info("jwt 인증 시작, access token 인증 헤더 정보 : {}, refresh 토큰 인증 헤더 정보 : {}", request.getHeader("Authorization"), request.getHeader("Refresh"));
+
+        if (request.getHeader("Authorization") == null && request.getHeader("Refresh") == null) {
+            Enumeration<String> headerNames = request.getHeaderNames();
+
+//            while (headerNames.hasMoreElements()) {
+//                String headerName = headerNames.nextElement();
+//                String headerValue = request.getHeader(headerName);
+//                log.info("인증 헤더 모두 null이기 때문에 헤더 정보 다 출력 => {} : {}", headerName, headerValue);
+//            }
+        }
+
         // HTTP 요청에서 Authorization헤더를 찾아 토큰 반환
-        String accessToken = tokenProvider.resolveToken(request, "Access");
+        String accessToken = tokenProvider.resolveToken(request, "Authorization");
+
+        if (accessToken == null) {
+            accessToken = tokenProvider.resolveToken(request, "Refresh");
+        }
 
 
         // 토큰이 있다면 진행
@@ -79,6 +97,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return Arrays.stream(whiteList).anyMatch(path::startsWith);
+        return Arrays.stream(whiteList).anyMatch(path::contains);
     }
 }
