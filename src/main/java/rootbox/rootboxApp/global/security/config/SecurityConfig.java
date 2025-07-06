@@ -72,6 +72,7 @@ public class SecurityConfig {
                         authorize -> {
 //                            authorize.requestMatchers("/swagger-ui/**").permitAll();
                             authorize.requestMatchers("/api/v1/users/auth/**").permitAll();
+                            authorize.requestMatchers("/api/v1/user/**").permitAll();
                             authorize.anyRequest().authenticated();
                         })
                 .exceptionHandling(
