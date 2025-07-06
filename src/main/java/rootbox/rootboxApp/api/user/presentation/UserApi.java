@@ -18,26 +18,24 @@ import java.io.IOException;
 @Slf4j
 @Validated
 @Tag(name = "User Api", description = "rootbox 사용자 관련 Api입니다.")
+@RequestMapping(value = "/api/v1/users")
 public class UserApi {
 
     private final UserService userService;
 
-    @GetMapping(value = "/api/v1/user/health")
-    public String health2() {return "I'm healthy!!!" ;}
-
-    @GetMapping(value = "/api/v1/users/auth/health")
+    @GetMapping(value = "/auth/health")
     public String health() {return "I'm healthy!!!!!" ;}
 
-    @PostMapping(value = "/api/v1/users/auth/kakao")
+    @PostMapping(value = "/auth/kakao")
     public CommonResponse<SocialLoginDto.KakaoSocialLoginResponseDto> kakaoSocialLogin(@RequestBody @Valid SocialLoginDto.KakaoSocialLoginRequestDto requestDto) {
         return CommonResponse.onSuccess(userService.socialLogin(requestDto));
     }
-    @GetMapping(value = "/api/v1/users/auth/kakao/code")
+    @GetMapping(value = "/auth/kakao/code")
     public void kakaoSocailLoginTest(HttpServletResponse response) throws IOException {
         response.sendRedirect(userService.getKakaoCode());
     }
 
-    @GetMapping(value = "/api/v1/users/auth/kakao/test")
+    @GetMapping(value = "/auth/kakao/test")
     public CommonResponse<String> getKakaoToken(@RequestParam("code") String code){
         return CommonResponse.onSuccess(userService.getKakaoToken(code));
     }
