@@ -12,6 +12,7 @@ import static org.springframework.http.HttpStatus.*;
 public enum GlobalErrorCode implements BaseErrorCode{
 
 
+    BAD_BODY(HttpStatus.BAD_REQUEST, "GLOBAL400", "요청 BODY 본문을 읽을 수 없습니다"),
     // AUTH + 401 Unauthorized - 권한 없음
     TOKEN_EXPIRED(UNAUTHORIZED, "AUTH401_1", "인증 토큰이 만료 되었습니다. 토큰을 재발급 해주세요"),
     INVALID_TOKEN(UNAUTHORIZED, "AUTH401_2", "인증 토큰이 유효하지 않습니다."),

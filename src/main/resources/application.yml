@@ -78,6 +78,14 @@ jwt:
 firebase:
   admin-sdk: ${FCM_KEY}
 
+oauth:
+  kakao:
+    baseUrl: ${KAKAO_BASE_URL}
+    clientId: ${KAKAO_CLIENT_ID}
+    redirectUrl : ${KAKAO_REDIRECT_URL}
+    secretKeyREST: ${KAKAO_SECRET_REST}
+    secretKeyAndroid : ${KAKAO_SECRET_ANDROID}
+
 #cloud:
 #  aws:
 #    lambda:
@@ -138,6 +146,12 @@ jwt:
   authorities-key: authoritiesKey
   access-token-validity-in-seconds: 120000 # 2 min
   refresh-token-validity-in-seconds: 300000 # 5 min
+oauth:
+  kakao:
+    baseUrl: ${KAKAO_BASE_URL}
+    clientId: ${KAKAO_REST_KEY}
+    redirectUrl : ${KAKAO_REDIRECT_URL}
+    secretKeyREST: ${KAKAO_SECRET_REST}
 
 #firebase:
 #  admin-sdk: ${FCM_KEY}

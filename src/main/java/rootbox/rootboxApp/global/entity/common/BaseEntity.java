@@ -17,10 +17,10 @@ public abstract class BaseEntity {
     @Column(name = "deleteYn")
     private Integer deleteYn = 0;
 
-    @Column(nullable = false, updatable = false, name = "reg_date")
+    @Column(nullable = false, updatable = false, name = "reg_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreatedDate
     private LocalDateTime regDate;
 
-    @Column(nullable = false,name = "mod_date")
+    @Column(nullable = false, name = "mod_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime modDate;
 }

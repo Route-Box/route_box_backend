@@ -7,7 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,6 +32,27 @@ import java.util.Optional;
 @Slf4j
 @RestControllerAdvice(annotations = {RestController.class})
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatusCode status,
+                                                                  WebRequest request) {
+
+        CommonResponse<Object> body = CommonResponse.onFailure(
+                GlobalErrorCode.BAD_BODY.getCode(),
+                "요청 본문을 읽을 수 없습니다. BODY 자체를 읽을 수 없는 상태입니다.. (형식 오류)",
+                null
+        );
+
+        return super.handleExceptionInternal(
+                ex,
+                body,
+                headers,
+                HttpStatus.BAD_REQUEST,
+                request
+        );
+    }
 
 
     @org.springframework.web.bind.annotation.ExceptionHandler
