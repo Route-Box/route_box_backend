@@ -36,7 +36,7 @@ public class SecurityConfig {
             new JwtAuthenticationExceptionHandler();
 
     private static final String[] whiteList = {
-            "/users/auth/nickname", "/users/auth/kakao/test", "/users/auth/kakao/code", "/users/auth/kakao", "/users/auth/health"
+            "/users/auth/nickname", "/users/auth/kakao/test", "/users/auth/kakao/code", "/users/auth/kakao", "/users/auth/health", "/users/auth/refreshToken"
     };
 
     /**

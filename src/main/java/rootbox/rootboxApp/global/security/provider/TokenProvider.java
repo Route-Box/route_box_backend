@@ -18,6 +18,7 @@ import rootbox.rootboxApp.global.common.exception.securityError.JwtAuthenticatio
 import rootbox.rootboxApp.global.entity.User;
 
 import java.security.Key;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
@@ -69,6 +70,9 @@ public class TokenProvider {
         }
 
         String token = request.getHeader(headerName);
+
+        if (tokenType.equals("Refresh"))
+            return token;
         if (StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
             return token.substring(7);
         }
@@ -117,6 +121,11 @@ public class TokenProvider {
         } catch (SecurityException | MalformedJwtException e) {
             log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
+            Claims expiredClaims = e.getClaims();
+            Date exp = expiredClaims.getExpiration();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            log.info("access 토큰 만료일자 : {}", sdf.format(exp));
+
             log.info("Expired JWT token, 만료된 JWT token 입니다.");
             throw new JwtAuthenticationException(GlobalErrorCode.TOKEN_EXPIRED);
 
@@ -131,13 +140,19 @@ public class TokenProvider {
         return false;
     }
 
-    public void validateRefreshToken(String refreshToken){
+    public boolean validateRefreshToken(String refreshToken){
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
+            return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
             throw new JwtAuthenticationException(GlobalErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
+            Claims expiredClaims = e.getClaims();
+            Date issuedAt = expiredClaims.getIssuedAt();
+            Date exp = expiredClaims.getExpiration();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            log.info("리프레시 토큰 생성일자 : {}, 리프레시 토큰 만료일자 : {}", sdf.format(issuedAt),sdf.format(exp));
             log.info("Expired JWT token, 만료된 JWT 리프레시 token 입니다.");
             throw new JwtAuthenticationException(GlobalErrorCode.REFRESH_TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
@@ -173,6 +188,13 @@ public class TokenProvider {
                         .collect(Collectors.toList());
         org.springframework.security.core.userdetails.User principal = new org.springframework.security.core.userdetails.User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+    public Authentication getRefreshAuthentication(String token){
+        Claims claims =
+                Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+
+        return new UsernamePasswordAuthenticationToken(null, token, null);
     }
 
 }

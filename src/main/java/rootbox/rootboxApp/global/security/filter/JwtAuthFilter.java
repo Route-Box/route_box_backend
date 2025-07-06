@@ -35,9 +35,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         log.info("jwt 인증 시작, access token 인증 헤더 정보 : {}, refresh 토큰 인증 헤더 정보 : {}", request.getHeader("Authorization"), request.getHeader("Refresh"));
+//        Enumeration<String> headerNames = request.getHeaderNames();
+//        while (headerNames.hasMoreElements()) {
+//            String headerName = headerNames.nextElement();
+//            String headerValue = request.getHeader(headerName);
+//            log.info("인증 헤더 모두 null이기 때문에 헤더 정보 다 출력 => {} : {}", headerName, headerValue);
+//        }
 
         if (request.getHeader("Authorization") == null && request.getHeader("Refresh") == null) {
-            Enumeration<String> headerNames = request.getHeaderNames();
+//            Enumeration<String> headerNames = request.getHeaderNames();
 
 //            while (headerNames.hasMoreElements()) {
 //                String headerName = headerNames.nextElement();
@@ -51,21 +57,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (accessToken == null) {
             accessToken = tokenProvider.resolveToken(request, "Refresh");
+
+            if (StringUtils.hasText(accessToken) && tokenProvider.validateRefreshToken(accessToken)){
+                Authentication authentication = tokenProvider.getRefreshAuthentication(accessToken);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }else{
+                SecurityContextHolder.getContext().setAuthentication(null);
+            }
+            // 다음 단계 실행 -> 다른 필터 및 컨트롤러 실행
+            filterChain.doFilter(request,response);
+
+        }else {
+
+
+            // 토큰이 있다면 진행
+            if (StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)) {
+
+                Authentication authentication = tokenProvider.getAuthentication(accessToken);
+                SecurityContextHolder.getContext().setAuthentication(authentication); // 인증 정보를 SecurityContext에 설정
+
+            } else {
+                SecurityContextHolder.getContext().setAuthentication(null);
+            }
+            // 다음 단계 실행 -> 다른 필터 및 컨트롤러 실행
+            filterChain.doFilter(request, response);
         }
-
-
-        // 토큰이 있다면 진행
-        if(StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)) {
-
-            Authentication authentication = tokenProvider.getAuthentication(accessToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication); // 인증 정보를 SecurityContext에 설정
-
-        }
-        else{
-            SecurityContextHolder.getContext().setAuthentication(null);
-        }
-        // 다음 단계 실행 -> 다른 필터 및 컨트롤러 실행
-        filterChain.doFilter(request,response);
     }
 
 
