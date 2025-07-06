@@ -22,26 +22,28 @@ public class SwaggerConfig {
         final String REFRESH_SCHEME_NAME = "Refresh Token";
 
         Components components = new Components()
+                // Authorization 헤더용 Access Token (bearer auth)
                 .addSecuritySchemes(ACCESS_SCHEME_NAME,
                         new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
                                 .bearerFormat("JWT")
+                                .in(SecurityScheme.In.HEADER)
                                 .name("Authorization")
-                                .in(SecurityScheme.In.HEADER))
+                )
+                // Refresh 헤더용 Refresh Token (apikey 방식)
                 .addSecuritySchemes(REFRESH_SCHEME_NAME,
                         new SecurityScheme()
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")
-                                .name("Refresh") // 예: 헤더 키를 다르게 설정할 수 있음
-                                .in(SecurityScheme.In.HEADER));
+                                .type(SecurityScheme.Type.APIKEY)
+                                .in(SecurityScheme.In.HEADER)
+                                .name("Refresh")
+                );
 
         return new OpenAPI()
                 .info(info)
                 .components(components)
                 .addServersItem(new Server().url("/"))
-                // 여기 두 개 모두 SecurityRequirement에 등록
+                // 원하는 경우 둘 다 글로벌로 적용 가능. 필요 시 각 API에 개별 지정 가능
                 .addSecurityItem(new SecurityRequirement().addList(ACCESS_SCHEME_NAME))
                 .addSecurityItem(new SecurityRequirement().addList(REFRESH_SCHEME_NAME));
     }

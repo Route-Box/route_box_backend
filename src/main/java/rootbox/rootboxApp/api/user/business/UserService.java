@@ -10,7 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import rootbox.rootboxApp.api.user.implementation.UserCommandAdapter;
 import rootbox.rootboxApp.api.user.implementation.UserQueryAdapter;
 import rootbox.rootboxApp.api.user.presentation.dto.JoinDto;
+import rootbox.rootboxApp.api.user.presentation.dto.ReAuthDto;
 import rootbox.rootboxApp.api.user.presentation.dto.SocialLoginDto;
+import rootbox.rootboxApp.global.common.exception.base.GlobalErrorCode;
+import rootbox.rootboxApp.global.common.exception.base.UserException;
 import rootbox.rootboxApp.global.entity.RefreshToken;
 import rootbox.rootboxApp.global.entity.User;
 import rootbox.rootboxApp.global.entity.enums.user.SocialType;
@@ -110,6 +113,42 @@ public class UserService {
         User joinedUser = userCommandAdapter.joinUser(request, user);
 
         return UserMapper.toJoinResponseDto(joinedUser);
+    }
+
+    public ReAuthDto.ReGenerateAccessTokenDto reGenerateAccessToken(String socialId) {
+
+        Optional<RefreshToken> refreshTokenByUserId = userQueryAdapter.findRefreshTokenByUserId(socialId);
+        Optional<User> userBySocialId = userQueryAdapter.findUserBySocialId(socialId);
+
+        if (userBySocialId.isEmpty())
+            throw new UserException(GlobalErrorCode.USER_NOT_FOUND);
+        else {
+            String accessToken = tokenProvider.createAccessToken(userBySocialId.get(), List.of(new SimpleGrantedAuthority(UserRole.USER.name())));
+            return ReAuthDto.ReGenerateAccessTokenDto.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshTokenByUserId.get().getRefreshToken())
+                    .build();
+
+        }
+    }
+
+    @Transactional
+    public ReAuthDto.ReGenerateRefreshTokenDto reGenerateRefreshToken(String socialId) {
+        Optional<User> userBySocialId = userQueryAdapter.findUserBySocialId(socialId);
+
+        if (userBySocialId.isEmpty())
+            throw new UserException(GlobalErrorCode.USER_NOT_FOUND);
+        else {
+            userCommandAdapter.deleteRefreshToken(socialId);
+
+            String accessToken = tokenProvider.createAccessToken(userBySocialId.get(), List.of(new SimpleGrantedAuthority(UserRole.USER.name())));
+            return ReAuthDto.ReGenerateRefreshTokenDto
+                    .builder()
+                    .accessToken(accessToken)
+                    .refreshToken(userCommandAdapter.saveRefreshToken(tokenProvider.createRefreshToken(),
+                            socialId).getRefreshToken())
+                    .build();
+        }
     }
 
     private String generateUniqueNickname() {

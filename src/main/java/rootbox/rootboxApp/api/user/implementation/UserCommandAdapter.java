@@ -43,4 +43,9 @@ public class UserCommandAdapter {
     public User joinUser(JoinDto.JoinRequestDto requestDto, User user){
         return user.joinUser(requestDto);
     }
+
+    public Void deleteRefreshToken(String socialId){
+        refreshTokenRepository.deleteByUserSocialId(socialId);
+        return null;
+    }
 }

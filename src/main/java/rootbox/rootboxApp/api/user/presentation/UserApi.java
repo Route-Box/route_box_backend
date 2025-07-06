@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rootbox.rootboxApp.api.user.business.UserService;
 import rootbox.rootboxApp.api.user.presentation.dto.JoinDto;
+import rootbox.rootboxApp.api.user.presentation.dto.ReAuthDto;
 import rootbox.rootboxApp.api.user.presentation.dto.SocialLoginDto;
 import rootbox.rootboxApp.global.common.CommonResponse;
 import rootbox.rootboxApp.global.entity.User;
@@ -48,6 +49,16 @@ public class UserApi {
     public CommonResponse<JoinDto.JoinNickNameCheckResponseDto> checkNickName(@RequestParam(name = "nickname") String nickname) {
         return CommonResponse.onSuccess(
                 JoinDto.JoinNickNameCheckResponseDto.builder().useYn(!userService.checkNickname(nickname)).build());
+    }
+
+    @GetMapping("/accessToken")
+    public CommonResponse<ReAuthDto.ReGenerateAccessTokenDto> reGenerateAccessToken(@RequestParam(name = "userSocialId") String userSocialId) {
+        return CommonResponse.onSuccess(userService.reGenerateAccessToken(userSocialId));
+    }
+
+    @GetMapping("/auth/refreshToken")
+    public CommonResponse<ReAuthDto.ReGenerateRefreshTokenDto> reGenerateRefreshToken(@RequestParam(name = "userSocialId") String userSocialId) {
+        return CommonResponse.onSuccess(userService.reGenerateRefreshToken(userSocialId));
     }
 
     @PatchMapping("/")
