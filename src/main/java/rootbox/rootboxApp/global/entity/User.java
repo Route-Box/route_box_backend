@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import rootbox.rootboxApp.api.user.presentation.dto.JoinDto;
 import rootbox.rootboxApp.global.entity.common.BaseEntity;
 import rootbox.rootboxApp.global.entity.enums.user.SocialType;
 import rootbox.rootboxApp.global.entity.enums.user.UserRole;
@@ -65,4 +66,21 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<Inquery> inqueryList = new ArrayList<>();
+
+    public User joinUser(JoinDto.JoinRequestDto joinRequestDto){
+        this.nickname = joinRequestDto.getNickName();
+        this.birthday = joinRequestDto.getBirthDay();
+        this.locationServiceYn = joinRequestDto.getLocationAgree() ? 1 : 0;
+        this.getAlarmYn = joinRequestDto.getAlarmAgree() ? 1 : 0;
+        if (joinRequestDto.getGender().equals("male")){
+            this.sex = UserSexType.MALE;
+        }
+        else if (joinRequestDto.getGender().equals("female")){
+            this.sex = UserSexType.FEMALE;
+        }
+        else
+            this.sex = UserSexType.SECRET;
+
+        return this;
+    }
 }

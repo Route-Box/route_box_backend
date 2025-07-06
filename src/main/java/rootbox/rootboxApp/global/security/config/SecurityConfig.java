@@ -35,8 +35,8 @@ public class SecurityConfig {
     private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler =
             new JwtAuthenticationExceptionHandler();
 
-    private static final String[] JWT_WHITE_LIST ={
-            "/users/login-tmp","/users/reissue"
+    private static final String[] whiteList = {
+            "/users/auth/nickname", "/users/auth/kakao/test", "/users/auth/kakao/code", "/users/auth/kakao", "/users/auth/health"
     };
 
     /**
@@ -80,7 +80,7 @@ public class SecurityConfig {
                                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                                         .accessDeniedHandler(jwtAccessDeniedHandler))
                 .addFilterBefore(
-                        new JwtAuthFilter(tokenProvider, JWT_WHITE_LIST),
+                        new JwtAuthFilter(tokenProvider, whiteList),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationExceptionHandler, JwtAuthFilter.class)
                 .build();

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import rootbox.rootboxApp.api.user.persistence.RefreshTokenRepository;
 import rootbox.rootboxApp.api.user.persistence.UserRepository;
+import rootbox.rootboxApp.api.user.presentation.dto.JoinDto;
 import rootbox.rootboxApp.global.annotations.Adapter;
 import rootbox.rootboxApp.global.entity.RefreshToken;
 import rootbox.rootboxApp.global.entity.User;
@@ -18,7 +19,7 @@ public class UserCommandAdapter {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public User createUser(String username, String socialUid){
+    public User createUser(String socialUid, String username){
 
         User newUser = User.builder()
                 .socialLoginUid(socialUid)
@@ -37,5 +38,9 @@ public class UserCommandAdapter {
                         .refreshToken(refreshToken)
                         .build()
         );
+    }
+
+    public User joinUser(JoinDto.JoinRequestDto requestDto, User user){
+        return user.joinUser(requestDto);
     }
 }

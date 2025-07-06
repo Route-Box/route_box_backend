@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rootbox.rootboxApp.api.user.implementation.UserCommandAdapter;
 import rootbox.rootboxApp.api.user.implementation.UserQueryAdapter;
+import rootbox.rootboxApp.api.user.presentation.dto.JoinDto;
 import rootbox.rootboxApp.api.user.presentation.dto.SocialLoginDto;
 import rootbox.rootboxApp.global.entity.RefreshToken;
 import rootbox.rootboxApp.global.entity.User;
@@ -62,6 +63,7 @@ public class UserService {
                         .isNew(false)
                         .loginType(SocialType.KAKAO.name())
                         .refreshToken(refreshTokenByUserId.get().getRefreshToken())
+                        .userSocialId(userBySocialId.get().getSocialLoginUid())
                         .build();
             }else{
                 // 리프레시 토큰 없음 만약 만료된 리프레시 토큰이면 추후에 만료 로직 탈 것이라 존재 유무만 봄
@@ -71,6 +73,7 @@ public class UserService {
                         .loginType(SocialType.KAKAO.name())
                         .refreshToken(userCommandAdapter.saveRefreshToken(tokenProvider.createRefreshToken(),
                                 userBySocialId.get().getSocialLoginUid()).getRefreshToken())
+                        .userSocialId(userBySocialId.get().getSocialLoginUid())
                         .build();
             }
         }else {
@@ -85,6 +88,7 @@ public class UserService {
                     .accessToken(accessToken)
                     .refreshToken(userCommandAdapter.saveRefreshToken(tokenProvider.createRefreshToken(),
                             user.getSocialLoginUid()).getRefreshToken())
+                    .userSocialId(user.getSocialLoginUid())
                     .build();
         }
     }
@@ -95,6 +99,17 @@ public class UserService {
 
     public String getKakaoToken(String code){
         return kakaoOauthService.getKakaoAccessToken(code);
+    }
+
+    public Boolean checkNickname(String nickname) {
+        return userQueryAdapter.findUserByNickname(nickname).isPresent();
+    }
+
+    @Transactional
+    public JoinDto.JoinResponseDto join(JoinDto.JoinRequestDto request, User user) {
+        User joinedUser = userCommandAdapter.joinUser(request, user);
+
+        return UserMapper.toJoinResponseDto(joinedUser);
     }
 
     private String generateUniqueNickname() {

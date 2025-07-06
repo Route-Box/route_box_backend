@@ -22,6 +22,8 @@ public class SocialLoginDto {
 
         @NotNull
         String refreshToken;
+        @NotNull
+        String userSocialId;
     }
 
     @Getter
