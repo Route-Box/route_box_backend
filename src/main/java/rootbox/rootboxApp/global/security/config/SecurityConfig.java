@@ -54,6 +54,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/favicon.io",
                                 "/swagger-ui/**",
+                                "/swagger-ui.html",
                                 "/docs/**");
     }
 
@@ -70,7 +71,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         authorize -> {
 //                            authorize.requestMatchers("/swagger-ui/**").permitAll();
-                            authorize.requestMatchers("/api/v1/users/**").permitAll();
+                            authorize.requestMatchers("/api/v1/users/auth/**").permitAll();
                             authorize.anyRequest().authenticated();
                         })
                 .exceptionHandling(

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import rootbox.rootboxApp.global.entity.common.BaseEntity;
 import rootbox.rootboxApp.global.entity.enums.user.SocialType;
 import rootbox.rootboxApp.global.entity.enums.user.UserRole;
@@ -20,6 +22,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@DynamicInsert
+@DynamicUpdate
 @Table(name = "user")
 public class User extends BaseEntity {
 
@@ -51,6 +55,10 @@ public class User extends BaseEntity {
     private Integer marketingYn = 0;
 
     private Integer travelPhotoWn = 0;
+
+    private Integer getAlarmYn = 0;
+
+    private Integer locationServiceYn = 0;
 
     @OneToMany(mappedBy = "user")
     private List<Route> routeList = new ArrayList<>();

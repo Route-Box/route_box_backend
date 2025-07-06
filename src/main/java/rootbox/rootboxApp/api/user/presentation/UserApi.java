@@ -1,22 +1,42 @@
 package rootbox.rootboxApp.api.user.presentation;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import rootbox.rootboxApp.api.user.business.UserService;
+import rootbox.rootboxApp.api.user.presentation.dto.SocialLoginDto;
+import rootbox.rootboxApp.global.common.CommonResponse;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 @Validated
 @Tag(name = "User Api", description = "rootbox 사용자 관련 Api입니다.")
-@RequestMapping(value = "/api/v1/user")
+@RequestMapping(value = "/api/v1/users")
 public class UserApi {
 
-    @GetMapping(value = "/health")
+    private final UserService userService;
+
+    @GetMapping(value = "/auth/health")
     public String health() {return "I'm healthy!!!" ;}
+
+    @PostMapping(value = "/auth/kakao")
+    public CommonResponse<SocialLoginDto.KakaoSocialLoginResponseDto> kakaoSocialLogin(@RequestBody @Valid SocialLoginDto.KakaoSocialLoginRequestDto requestDto) {
+        return CommonResponse.onSuccess(userService.socialLogin(requestDto));
+    }
+    @GetMapping(value = "/auth/kakao/code")
+    public void kakaoSocailLoginTest(HttpServletResponse response) throws IOException {
+        response.sendRedirect(userService.getKakaoCode());
+    }
+
+    @GetMapping(value = "/auth/kakao/test")
+    public CommonResponse<String> getKakaoToken(@RequestParam("code") String code){
+        return CommonResponse.onSuccess(userService.getKakaoToken(code));
+    }
 }
