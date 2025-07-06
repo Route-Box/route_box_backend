@@ -32,12 +32,11 @@ logging:
     org.springframework.security.web.FilterChainProxy: DEBUG
 spring:
   application:
-    name: tree-server-dev
+    name: routebox-server-dev
   config:
     activate:
       on-profile: "dev"
-  jackson:
-    time-zone: Asia/Seoul
+  datasource:
     username: ${aws.db.username}
     password: ${aws.db.password}
     url: jdbc:mysql://${aws.db.url}
@@ -84,7 +83,6 @@ oauth:
     clientId: ${KAKAO_CLIENT_ID}
     redirectUrl : ${KAKAO_REDIRECT_URL}
     secretKeyREST: ${KAKAO_SECRET_REST}
-    secretKeyAndroid : ${KAKAO_SECRET_ANDROID}
 
 #cloud:
 #  aws:
