@@ -37,9 +37,9 @@ spring:
     activate:
       on-profile: "dev"
   datasource:
-    username: ${aws.db.username}
-    password: ${aws.db.password}
-    url: jdbc:mysql://${aws.db.url}
+    username: ${AWS_DB_USERNAME}
+    password: ${AWS_DB_PASSWORD}
+    url: jdbc:mysql://${AWS_DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
