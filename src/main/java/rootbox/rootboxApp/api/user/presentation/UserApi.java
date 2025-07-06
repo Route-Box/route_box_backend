@@ -26,7 +26,7 @@ public class UserApi {
     public String health2() {return "I'm healthy!!!" ;}
 
     @GetMapping(value = "/api/v1/users/auth/health")
-    public String health() {return "I'm healthy!!!" ;}
+    public String health() {return "I'm healthy!!!!!" ;}
 
     @PostMapping(value = "/api/v1/users/auth/kakao")
     public CommonResponse<SocialLoginDto.KakaoSocialLoginResponseDto> kakaoSocialLogin(@RequestBody @Valid SocialLoginDto.KakaoSocialLoginRequestDto requestDto) {
