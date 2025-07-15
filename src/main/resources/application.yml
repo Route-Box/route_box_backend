@@ -83,6 +83,10 @@ oauth:
     clientId: ${KAKAO_CLIENT_ID}
     redirectUrl : ${KAKAO_REDIRECT_URL}
     secretKeyREST: ${KAKAO_SECRET_REST}
+  google:
+    baseUrl : ${GOOGLE_BASE_URL}
+    apiKey : ${GOOGLE_API_KEY}
+
 
 #cloud:
 #  aws:
@@ -150,6 +154,9 @@ oauth:
     clientId: ${KAKAO_REST_KEY}
     redirectUrl : ${KAKAO_REDIRECT_URL}
     secretKeyREST: ${KAKAO_SECRET_REST}
+  google:
+    baseUrl : ${GOOGLE_BASE_URL}
+    apiKey : ${GOOGLE_API_KEY}
 
 #firebase:
 #  admin-sdk: ${FCM_KEY}
