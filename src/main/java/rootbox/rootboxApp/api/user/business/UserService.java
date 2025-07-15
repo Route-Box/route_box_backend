@@ -52,6 +52,19 @@ public class UserService {
 
         // 로그인 처리
         if (userBySocialId.isPresent()) {
+            User user = userBySocialId.get();
+            if (user.getNickname() ==null){
+                String accessToken = tokenProvider.createAccessToken(user, List.of(new SimpleGrantedAuthority(UserRole.USER.name())));
+                return SocialLoginDto.KakaoSocialLoginResponseDto
+                        .builder()
+                        .loginType(SocialType.KAKAO.name())
+                        .isNew(true)
+                        .accessToken(accessToken)
+                        .refreshToken(userCommandAdapter.saveRefreshToken(tokenProvider.createRefreshToken(),
+                                user.getSocialLoginUid()).getRefreshToken())
+                        .userSocialId(user.getSocialLoginUid())
+                        .build();
+            }
             Optional<RefreshToken> refreshTokenByUserId = userQueryAdapter.findRefreshTokenByUserId(kakaoUserInfo.getId());
 
             String accessToken = tokenProvider.createAccessToken(userBySocialId.get(), List.of(new SimpleGrantedAuthority(UserRole.USER.name())));
